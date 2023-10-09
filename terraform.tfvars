@@ -1,0 +1,14 @@
+subscription_id      = "00000000-0000-0000-0000-000000000000"
+tenant_id            = "00000000-0000-0000-0000-000000000000"
+tenant_name          = "<tenant_name>.onmicrosoft.com"
+domain_name          = "contoso.com"
+primary_location     = "eastus"
+secondary_location   = "westus"
+resource_prefix      = "avd"
+deploy_personal      = 1
+deploy_hybrid        = 1
+deploy_aad           = 1
+admin_username       = "localadmin"
+admin_password       = ""
+cloud_admin          = "cloudadmin"
+cloud_admin_password = ""
