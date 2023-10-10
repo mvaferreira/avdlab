@@ -18,7 +18,7 @@ that arise or result from the use or distribution of the Sample Code.
 This is just a lab for deploying and learning Azure Virtual Desktop.
 Do not use it for production. This is intended to save cost, so not following guidelines for performance and best practices.
 
-If you need to deploy a production environment for AVD, please start here
+If you need to deploy a production environment for AVD, please start here <br>
 https://learn.microsoft.com/en-us/azure/architecture/guide/virtual-desktop/start-here
 
 # Features
