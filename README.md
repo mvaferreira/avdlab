@@ -42,7 +42,30 @@ FSLogix configured for both ADDS and AAD
 RBAC configured
 ```
 
+# Terraform
+
+Please download the latest Terraform software at https://developer.hashicorp.com/terraform/downloads <br>
+Check tutorials at https://developer.hashicorp.com/terraform/tutorials/azure-get-started 
+
+Basic Terraform commands:<br>
+
+#Format tf files for better indentation<br>
+terraform fmt
+
+#Verify syntax
+terraform validate
+
+#Create a basic plan to preview changes in Azure
+terraform plan
+
+#Deploy resources to Azure
+terraform apply
+
+#Destroy resources deployed on Azure
+terraform destroy
+
 # Configuration
 
 Please adjust terraform.tfvars to reflect your environment.<br>
 Check variables.tf for possible configuration options and add them to terraform.tfvars.
+
