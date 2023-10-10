@@ -13,7 +13,9 @@ that arise or result from the use or distribution of the Sample Code.
 
 Azure Virtual Desktop built with Terraform and Powershell
 
-#Features
+# Features
+
+```
 Active Directory domain deployment through Powershell DSC
 Group Policies pre-created for AVD deployments
 Microsoft Entra ID (AAD) + Active Directory hybrid identities (ADDS)
@@ -29,3 +31,4 @@ AVD Start VM on Connect
 AVD Scheduled Agent Updates
 FSLogix configured for both ADDS and AAD
 RBAC configured
+```
