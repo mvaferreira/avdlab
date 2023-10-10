@@ -42,14 +42,18 @@ FSLogix configured for both ADDS and AAD
 RBAC configured
 ```
 
-# Terraform
+# Getting Started
 
 Please download the latest Terraform software at https://developer.hashicorp.com/terraform/downloads <br>
-Check tutorials at https://developer.hashicorp.com/terraform/tutorials/azure-get-started 
+Check tutorials at https://developer.hashicorp.com/terraform/tutorials/azure-get-started <br>
+Download Azure CLI from https://learn.microsoft.com/en-us/cli/azure/install-azure-cli
 
 Basic Terraform commands:<br>
 
-#After downloading this lab, download Terraform and initialize provider plugins<br>
+#After downloading this lab, download Terraform and login to Azure CLI<br>
+az login
+
+#Initialize provider plugins<br>
 terraform init
 
 #Format tf files for better indentation<br>
