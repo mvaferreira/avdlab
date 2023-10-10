@@ -116,6 +116,7 @@ New-GpLink -Name "Enable Hybrid VMs" -Target $HybridOUPath -LinkEnabled 'Yes'
 # Install Azure AD Connect Cloud Sync
 # Work in progress.
 #
+<#
 Write-Output "[$(Get-Date)]Configuring AAD Connect Cloud Sync..."
 Set-ADUser -Identity avduser -UserPrincipalName "avduser@$($TenantName)"
 Set-ADUser -Identity avdadmin -UserPrincipalName "avdadmin@$($TenantName)"
@@ -147,3 +148,4 @@ Add-AADCloudSyncADDomain -DomainName $DomainName -Credential $DomainAdminCreds
 Remove-Item -Path "C:\Program Files\Microsoft Azure AD Connect Provisioning Agent\Newtonsoft.Json.dll" -Force
 Rename-Item -Path "C:\Program Files\Microsoft Azure AD Connect Provisioning Agent\Newtonsoft.Json.dll_bak" -NewName "C:\Program Files\Microsoft Azure AD Connect Provisioning Agent\Newtonsoft.Json.dll" -Force
 Restart-Service -Name AADConnectProvisioningAgent
+#>
