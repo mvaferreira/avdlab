@@ -42,6 +42,11 @@ FSLogix configured for both ADDS and AAD
 RBAC configured
 ```
 
+# Configuration
+
+Please adjust terraform.tfvars to reflect your environment.<br>
+Check variables.tf for possible configuration options and add them to terraform.tfvars.
+
 # Getting Started
 
 Please download the latest Terraform software at https://developer.hashicorp.com/terraform/downloads <br>
@@ -70,9 +75,4 @@ terraform apply
 
 #Destroy resources deployed on Azure<br>
 terraform destroy
-
-# Configuration
-
-Please adjust terraform.tfvars to reflect your environment.<br>
-Check variables.tf for possible configuration options and add them to terraform.tfvars.
 
