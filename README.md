@@ -52,16 +52,16 @@ Basic Terraform commands:<br>
 #Format tf files for better indentation<br>
 terraform fmt
 
-#Verify syntax
+#Verify syntax<br>
 terraform validate
 
-#Create a basic plan to preview changes in Azure
+#Create a basic plan to preview changes in Azure<br>
 terraform plan
 
-#Deploy resources to Azure
+#Deploy resources to Azure<br>
 terraform apply
 
-#Destroy resources deployed on Azure
+#Destroy resources deployed on Azure<br>
 terraform destroy
 
 # Configuration
