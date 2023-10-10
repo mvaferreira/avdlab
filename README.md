@@ -76,3 +76,12 @@ terraform apply
 #Destroy resources deployed on Azure<br>
 terraform destroy
 
+# Work in progress
+
+This is a work in progress...<br>
+
+To Do list:
+
+- Configure AzureAD Kerberos Server Object in ADDS for SSO<br>
+https://learn.microsoft.com/en-us/azure/active-directory/authentication/howto-authentication-passwordless-security-key-on-premises <br>
+https://learn.microsoft.com/en-us/azure/active-directory/devices/how-to-hybrid-join
