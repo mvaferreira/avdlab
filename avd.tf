@@ -77,6 +77,72 @@ resource "azurerm_virtual_desktop_workspace_application_group_association" "avd_
   application_group_id = azurerm_virtual_desktop_application_group.avdtfappgroup_adds_apps.id
 }
 
+#Private Endpoint ADDS - Host Pool
+
+resource "azurerm_private_endpoint" "avd_adds_privend_hostpool" {
+  name                = "${var.resource_prefix}-adds-pooled-privend-conn"
+  location            = var.primary_location
+  resource_group_name = azurerm_resource_group.rg_primary.name
+  subnet_id           = azurerm_subnet.private_subnets_primary[0].id
+  depends_on          = [azurerm_subnet.private_subnets_primary[0]]
+
+  private_service_connection {
+    name                           = "${var.resource_prefix}-adds-privsvcconn"
+    private_connection_resource_id = azurerm_virtual_desktop_host_pool.avdtfpool_adds.id
+    subresource_names              = ["connection"]
+    is_manual_connection           = false
+  }
+
+  private_dns_zone_group {
+    name                 = "${var.resource_prefix}-adds-dns-zone-group"
+    private_dns_zone_ids = [azurerm_private_dns_zone.privatedns_avd.id]
+  }
+}
+
+#Private Endpoint ADDS - Workspace Feed
+
+resource "azurerm_private_endpoint" "avd_adds_privend_wks_feed" {
+  name                = "${var.resource_prefix}-adds-wks-feed-privend-conn"
+  location            = var.primary_location
+  resource_group_name = azurerm_resource_group.rg_primary.name
+  subnet_id           = azurerm_subnet.private_subnets_primary[0].id
+  depends_on          = [azurerm_subnet.private_subnets_primary[0]]
+
+  private_service_connection {
+    name                           = "${var.resource_prefix}-adds-wks-privsvcconn"
+    private_connection_resource_id = azurerm_virtual_desktop_workspace.avdwks_adds.id
+    subresource_names              = ["feed"]
+    is_manual_connection           = false
+  }
+
+  private_dns_zone_group {
+    name                 = "${var.resource_prefix}-adds-dns-zone-group"
+    private_dns_zone_ids = [azurerm_private_dns_zone.privatedns_avd.id]
+  }
+}
+
+#Private Endpoint ADDS - Workspace Global
+
+resource "azurerm_private_endpoint" "avd_adds_privend_wks_global" {
+  name                = "${var.resource_prefix}-adds-wks-global-privend-conn"
+  location            = var.primary_location
+  resource_group_name = azurerm_resource_group.rg_primary.name
+  subnet_id           = azurerm_subnet.private_subnets_primary[0].id
+  depends_on          = [azurerm_subnet.private_subnets_primary[0]]
+
+  private_service_connection {
+    name                           = "${var.resource_prefix}-adds-wks-privsvcconn"
+    private_connection_resource_id = azurerm_virtual_desktop_workspace.avdwks_adds.id
+    subresource_names              = ["global"]
+    is_manual_connection           = false
+  }
+
+  private_dns_zone_group {
+    name                 = "${var.resource_prefix}-adds-dns-zone-group"
+    private_dns_zone_ids = [azurerm_private_dns_zone.privatedns_avd_global.id]
+  }
+}
+
 ##AAD Pooled
 
 resource "azurerm_virtual_desktop_host_pool" "avdtfpool_aad" {

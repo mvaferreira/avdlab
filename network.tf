@@ -246,3 +246,31 @@ resource "azurerm_private_dns_zone_virtual_network_link" "dns_vnet_primary_link"
   private_dns_zone_name = azurerm_private_dns_zone.privatedns_file.name
   virtual_network_id    = azurerm_virtual_network.vnet_primary.id
 }
+
+#Private DNS Zone privatelink.wvd.microsoft.com
+
+resource "azurerm_private_dns_zone" "privatedns_avd" {
+  name                = "privatelink.wvd.microsoft.com"
+  resource_group_name = azurerm_resource_group.rg_primary.name
+}
+
+resource "azurerm_private_dns_zone_virtual_network_link" "dns_vnet_primary_link_avd" {
+  name                  = "dns-vnet-primary-link"
+  resource_group_name   = azurerm_resource_group.rg_primary.name
+  private_dns_zone_name = azurerm_private_dns_zone.privatedns_avd.name
+  virtual_network_id    = azurerm_virtual_network.vnet_primary.id
+}
+
+#Private DNS Zone privatelink-global.wvd.microsoft.com
+
+resource "azurerm_private_dns_zone" "privatedns_avd_global" {
+  name                = "privatelink-global.wvd.microsoft.com"
+  resource_group_name = azurerm_resource_group.rg_primary.name
+}
+
+resource "azurerm_private_dns_zone_virtual_network_link" "dns_vnet_primary_link_avd_global" {
+  name                  = "dns-vnet-primary-link"
+  resource_group_name   = azurerm_resource_group.rg_primary.name
+  private_dns_zone_name = azurerm_private_dns_zone.privatedns_avd_global.name
+  virtual_network_id    = azurerm_virtual_network.vnet_primary.id
+}

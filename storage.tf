@@ -57,24 +57,6 @@ resource "azurerm_storage_blob" "script_files_creategpos_aad_connect" {
   depends_on             = [azurerm_storage_container.dsc_storage_account_container_scripts]
 }
 
-resource "azurerm_storage_blob" "installation_creategpos_aad_connect" {
-  name                   = "AADConnectProvisioningAgentSetup.exe"
-  storage_account_name   = azurerm_storage_account.dsc_storage_account.name
-  storage_container_name = azurerm_storage_container.dsc_storage_account_container_scripts.name
-  type                   = "Block"
-  source                 = "AADConnectProvisioningAgentSetup.exe"
-  depends_on             = [azurerm_storage_container.dsc_storage_account_container_scripts]
-}
-
-resource "azurerm_storage_blob" "dll_file_creategpos_aad_connect" {
-  name                   = "Newtonsoft.Json.dll"
-  storage_account_name   = azurerm_storage_account.dsc_storage_account.name
-  storage_container_name = azurerm_storage_container.dsc_storage_account_container_scripts.name
-  type                   = "Block"
-  source                 = "Newtonsoft.Json.dll"
-  depends_on             = [azurerm_storage_container.dsc_storage_account_container_scripts]
-}
-
 resource "azurerm_storage_blob" "script_files_addstoragetodomain" {
   name                   = "AddStorageAccountDomain.ps1"
   storage_account_name   = azurerm_storage_account.dsc_storage_account.name
