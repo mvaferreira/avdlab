@@ -49,6 +49,9 @@ Check tutorials at https://developer.hashicorp.com/terraform/tutorials/azure-get
 
 Basic Terraform commands:<br>
 
+#After downloading this lab, download Terraform and initialize provider plugins<br>
+terraform init
+
 #Format tf files for better indentation<br>
 terraform fmt
 
