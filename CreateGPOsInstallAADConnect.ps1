@@ -37,10 +37,10 @@ $DomainAdminCreds = New-Object System.Management.Automation.PSCredential ("$($Do
 # Create and link GPOs to domain
 #
 
-$ComputersOUPath = "OU=Computers,OU=Lab,DC=$($DomainName.ToString().Split(".")[0]),DC=$($DomainName.ToString().Split(".")[1])"
-$HybridOUPath = "OU=Hybrid,OU=Computers,OU=Lab,DC=$($DomainName.ToString().Split(".")[0]),DC=$($DomainName.ToString().Split(".")[1])"
-$RootOUPath = "DC=$($DomainName.ToString().Split(".")[0]),DC=$($DomainName.ToString().Split(".")[1])"
-$UsersOUPath = "OU=Users,OU=Lab,DC=$($DomainName.ToString().Split(".")[0]),DC=$($DomainName.ToString().Split(".")[1])"
+$ComputersOUPath = "OU=Computers,OU=Lab,$((Get-ADDomain).DistinguishedName)"
+$HybridOUPath = "OU=Hybrid,OU=Computers,OU=Lab,$((Get-ADDomain).DistinguishedName)"
+$RootOUPath = (Get-ADDomain).DistinguishedName
+$UsersOUPath = "OU=Users,OU=Lab,$((Get-ADDomain).DistinguishedName)"
 
 $FirewallParam = @{
     DisplayName = 'Windows Remote Management (HTTP-In) AllSubnets'
