@@ -67,7 +67,7 @@ variable "vmsize" {
 }
 
 variable "dcsize" {
-  type = string
+  type    = string
   default = "Standard_B4ms"
 }
 
@@ -135,6 +135,7 @@ locals {
   aad_script                  = "https://${azurerm_storage_account.dsc_storage_account.name}.blob.core.windows.net/scripts/ConfigureAADVM.ps1"
   creategposaadconnect_script = "https://${azurerm_storage_account.dsc_storage_account.name}.blob.core.windows.net/scripts/CreateGPOsInstallAADConnect.ps1"
   addstoragetodomain_script   = "https://${azurerm_storage_account.dsc_storage_account.name}.blob.core.windows.net/scripts/AddStorageAccountDomain.ps1"
+  customize_sysprep_script    = "https://${azurerm_storage_account.dsc_storage_account.name}.blob.core.windows.net/scripts/CustomizeVM.ps1"
 }
 
 output "passwd" {

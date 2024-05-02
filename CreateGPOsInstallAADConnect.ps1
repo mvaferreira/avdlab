@@ -109,8 +109,8 @@ Set-GPRegistryValue -Name "Enable Powershell Transcript" -Key "HKLM\Software\Pol
 New-GpLink -Name "FSLogix Settings" -Target $ComputersOUPath -LinkEnabled 'Yes'
 New-GpLink -Name "Enable RDP Shortpath Managed" -Target $ComputersOUPath -LinkEnabled 'Yes'
 New-GpLink -Name "Enable Timezone Redirection" -Target $ComputersOUPath -LinkEnabled 'Yes'
-#New-GpLink -Name "Enable Powershell Transcript" -Target $RootOUPath -LinkEnabled 'Yes'
 New-GpLink -Name "Enable Hybrid VMs" -Target $HybridOUPath -LinkEnabled 'Yes'
+#New-GpLink -Name "Enable Powershell Transcript" -Target $RootOUPath -LinkEnabled 'Yes'
 
 #
 # Install Azure AD Connect Cloud Sync

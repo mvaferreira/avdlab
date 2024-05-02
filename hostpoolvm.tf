@@ -62,7 +62,7 @@ resource "azurerm_windows_virtual_machine" "avdvms_adds" {
     type = "SystemAssigned"
   }
 
-  source_image_id = azurerm_shared_image_version.compute_gallery_version.id
+  source_image_id = azurerm_shared_image_version.compute_gallery_version_win10.id
 
   depends_on = [azurerm_virtual_network_dns_servers.dnsserver_dc_primary]
 }
@@ -179,7 +179,7 @@ resource "azurerm_windows_virtual_machine" "avdvms_aad" {
     type = "SystemAssigned"
   }
 
-  source_image_id = azurerm_shared_image_version.compute_gallery_version.id
+  source_image_id = azurerm_shared_image_version.compute_gallery_version_win10.id
 
   depends_on = [azurerm_virtual_network_dns_servers.dnsserver_dc_primary]
 }
@@ -276,7 +276,7 @@ resource "azurerm_windows_virtual_machine" "avdvms_haadj" {
     type = "SystemAssigned"
   }
 
-  source_image_id = azurerm_shared_image_version.compute_gallery_version.id
+  source_image_id = azurerm_shared_image_version.compute_gallery_version_win10.id
 
   depends_on = [azurerm_virtual_network_dns_servers.dnsserver_dc_primary]
 }
@@ -394,7 +394,7 @@ resource "azurerm_windows_virtual_machine" "avdvms_adds_win11p" {
     type = "SystemAssigned"
   }
 
-  source_image_id = azurerm_shared_image_version.compute_gallery_version_win11p[0].id
+  source_image_id = azurerm_shared_image_version.compute_gallery_version_win11[0].id
 
   depends_on = [azurerm_virtual_network_dns_servers.dnsserver_dc_primary]
 }

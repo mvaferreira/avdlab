@@ -8,6 +8,11 @@ resource "azurerm_resource_group" "rg_secondary" {
   location = var.secondary_location
 }
 
+resource "azurerm_resource_group" "rg_temp" {
+  name     = "${var.resource_prefix}-temp-rg"
+  location = var.primary_location
+}
+
 resource "azurerm_windows_virtual_machine" "domain_controller" {
   name                     = "${var.resource_prefix}-adds-dc1"
   resource_group_name      = azurerm_resource_group.rg_primary.name
@@ -30,7 +35,7 @@ resource "azurerm_windows_virtual_machine" "domain_controller" {
     publisher = "MicrosoftWindowsServer"
     offer     = "WindowsServer"
     sku       = "2022-datacenter-g2"
-    version   = "20348.887.220806"
+    version   = "latest"
   }
 
   os_disk {
@@ -115,7 +120,7 @@ resource "azurerm_shared_image_gallery" "compute_gallery" {
 
 resource "azurerm_windows_virtual_machine" "win10_template" {
   name                     = "${var.resource_prefix}-tempvm1"
-  resource_group_name      = azurerm_resource_group.rg_primary.name
+  resource_group_name      = azurerm_resource_group.rg_temp.name
   location                 = var.primary_location
   network_interface_ids    = [azurerm_network_interface.tempvm1_nic.id]
   size                     = var.vmsize
@@ -145,7 +150,7 @@ resource "azurerm_windows_virtual_machine" "win10_template" {
   }
 }
 
-resource "azurerm_virtual_machine_extension" "sysprep_tempvm" {
+resource "azurerm_virtual_machine_extension" "customize_sysprep_tempvm_win10" {
   name                       = "sysprep_tempvm"
   virtual_machine_id         = azurerm_windows_virtual_machine.win10_template.id
   publisher                  = "Microsoft.Compute"
@@ -155,30 +160,61 @@ resource "azurerm_virtual_machine_extension" "sysprep_tempvm" {
   depends_on                 = [azurerm_windows_virtual_machine.win10_template]
 
   protected_settings = <<PROTECTED_SETTINGS
-  {    
-    "commandToExecute": "powershell -ExecutionPolicy Unrestricted C:\\windows\\system32\\sysprep\\sysprep.exe /generalize /oobe /shutdown /mode:vm"
-  }
+    {
+      "commandToExecute": "powershell.exe -Command \"./CustomizeVM.ps1;\""
+    }
   PROTECTED_SETTINGS
+
+  settings = <<SETTINGS
+    {
+        "fileUris": [
+          "${local.customize_sysprep_script}"
+        ]
+    }
+  SETTINGS
 }
 
-resource "null_resource" "generalize_tempvm" {
-  depends_on = [azurerm_virtual_machine_extension.sysprep_tempvm]
+resource "null_resource" "wait_sysprep_win10" {
   provisioner "local-exec" {
-    command = "az vm generalize --resource-group ${azurerm_resource_group.rg_primary.name} --name ${azurerm_windows_virtual_machine.win10_template.name}"
+    command     = "Start-Sleep -Seconds 120"
+    interpreter = ["Powershell", "-Command"]
   }
+
+  depends_on = [azurerm_virtual_machine_extension.customize_sysprep_tempvm_win10]
 }
 
-resource "time_sleep" "wait_generalize" {
-  depends_on      = [null_resource.generalize_tempvm]
-  count           = 60
-  create_duration = "1s"
-}
-
-resource "null_resource" "deallocate_tempvm" {
-  depends_on = [time_sleep.wait_generalize]
+resource "null_resource" "deallocate_tempvm_win10" {
   provisioner "local-exec" {
-    command = "az vm deallocate --resource-group ${azurerm_resource_group.rg_primary.name} --name ${azurerm_windows_virtual_machine.win10_template.name}"
+    command = "az vm deallocate --resource-group ${azurerm_resource_group.rg_temp.name} --name ${azurerm_windows_virtual_machine.win10_template.name}"
   }
+
+  depends_on = [null_resource.wait_sysprep_win10]
+}
+
+resource "null_resource" "wait_deallocate_vm_win10" {
+  provisioner "local-exec" {
+    command     = "Start-Sleep -Seconds 60"
+    interpreter = ["Powershell", "-Command"]
+  }
+
+  depends_on = [null_resource.deallocate_tempvm_win10]
+}
+
+resource "null_resource" "generalize_tempvm_win10" {
+  provisioner "local-exec" {
+    command = "az vm generalize --resource-group ${azurerm_resource_group.rg_temp.name} --name ${azurerm_windows_virtual_machine.win10_template.name}"
+  }
+
+  depends_on = [null_resource.wait_deallocate_vm_win10]
+}
+
+resource "null_resource" "wait_generalize_win10" {
+  provisioner "local-exec" {
+    command     = "Start-Sleep -Seconds 60"
+    interpreter = ["Powershell", "-Command"]
+  }
+
+  depends_on = [null_resource.generalize_tempvm_win10]
 }
 
 resource "azurerm_shared_image" "win10_multi" {
@@ -202,10 +238,10 @@ resource "azurerm_image" "win10_image" {
   resource_group_name       = azurerm_resource_group.rg_primary.name
   source_virtual_machine_id = azurerm_windows_virtual_machine.win10_template.id
   hyper_v_generation        = "V2"
-  depends_on                = [null_resource.generalize_tempvm]
+  depends_on                = [null_resource.wait_generalize_win10]
 }
 
-resource "azurerm_shared_image_version" "compute_gallery_version" {
+resource "azurerm_shared_image_version" "compute_gallery_version_win10" {
   name                = "0.0.1"
   gallery_name        = azurerm_shared_image_gallery.compute_gallery.name
   image_name          = azurerm_shared_image.win10_multi.name
@@ -230,7 +266,7 @@ resource "azurerm_shared_image_version" "compute_gallery_version" {
 resource "azurerm_windows_virtual_machine" "win11_template" {
   count                    = var.deploy_personal
   name                     = "${var.resource_prefix}-tempvm2"
-  resource_group_name      = azurerm_resource_group.rg_primary.name
+  resource_group_name      = azurerm_resource_group.rg_temp.name
   location                 = var.primary_location
   network_interface_ids    = [azurerm_network_interface.tempvm2_nic[0].id]
   size                     = var.vmsize
@@ -249,7 +285,7 @@ resource "azurerm_windows_virtual_machine" "win11_template" {
   source_image_reference {
     publisher = "MicrosoftWindowsDesktop"
     offer     = "windows-11"
-    sku       = "win11-22h2-ent"
+    sku       = "win11-23h2-ent"
     version   = "latest"
   }
 
@@ -260,7 +296,7 @@ resource "azurerm_windows_virtual_machine" "win11_template" {
   }
 }
 
-resource "azurerm_virtual_machine_extension" "sysprep_win11_tempvm" {
+resource "azurerm_virtual_machine_extension" "customize_sysprep_tempvm_win11" {
   count                      = var.deploy_personal
   name                       = "sysprep_tempvm"
   virtual_machine_id         = azurerm_windows_virtual_machine.win11_template[0].id
@@ -271,32 +307,61 @@ resource "azurerm_virtual_machine_extension" "sysprep_win11_tempvm" {
   depends_on                 = [azurerm_windows_virtual_machine.win11_template[0]]
 
   protected_settings = <<PROTECTED_SETTINGS
-  {    
-    "commandToExecute": "powershell -ExecutionPolicy Unrestricted C:\\windows\\system32\\sysprep\\sysprep.exe /generalize /oobe /shutdown /mode:vm"
-  }
+    {
+      "commandToExecute": "powershell.exe -Command \"./CustomizeVM.ps1;\""
+    }
   PROTECTED_SETTINGS
+
+  settings = <<SETTINGS
+    {
+        "fileUris": [
+          "${local.customize_sysprep_script}"
+        ]
+    }
+  SETTINGS
 }
 
-resource "null_resource" "generalize_win11_tempvm" {
-  count      = var.deploy_personal
-  depends_on = [azurerm_virtual_machine_extension.sysprep_win11_tempvm[0]]
+resource "null_resource" "wait_sysprep_win11" {
   provisioner "local-exec" {
-    command = "az vm generalize --resource-group ${azurerm_resource_group.rg_primary.name} --name ${azurerm_windows_virtual_machine.win11_template[0].name}"
+    command     = "Start-Sleep -Seconds 120"
+    interpreter = ["Powershell", "-Command"]
   }
+
+  depends_on = [azurerm_virtual_machine_extension.customize_sysprep_tempvm_win11]
 }
 
-resource "time_sleep" "wait_generalize_win11" {
-  depends_on      = [null_resource.generalize_win11_tempvm[0]]
-  count           = 60
-  create_duration = "1s"
-}
-
-resource "null_resource" "deallocate_win11_tempvm" {
-  count = var.deploy_personal
-  depends_on = [time_sleep.wait_generalize_win11[0], null_resource.generalize_win11_tempvm[0]]
+resource "null_resource" "deallocate_tempvm_win11" {
   provisioner "local-exec" {
-    command = "az vm deallocate --resource-group ${azurerm_resource_group.rg_primary.name} --name ${azurerm_windows_virtual_machine.win11_template[0].name}"
+    command = "az vm deallocate --resource-group ${azurerm_resource_group.rg_temp.name} --name ${azurerm_windows_virtual_machine.win11_template[0].name}"
   }
+
+  depends_on = [null_resource.wait_sysprep_win11]
+}
+
+resource "null_resource" "wait_deallocate_vm_win11" {
+  provisioner "local-exec" {
+    command     = "Start-Sleep -Seconds 60"
+    interpreter = ["Powershell", "-Command"]
+  }
+
+  depends_on = [null_resource.deallocate_tempvm_win11]
+}
+
+resource "null_resource" "generalize_tempvm_win11" {
+  provisioner "local-exec" {
+    command = "az vm generalize --resource-group ${azurerm_resource_group.rg_temp.name} --name ${azurerm_windows_virtual_machine.win11_template[0].name}"
+  }
+
+  depends_on = [null_resource.wait_deallocate_vm_win11]
+}
+
+resource "null_resource" "wait_generalize_win11" {
+  provisioner "local-exec" {
+    command     = "Start-Sleep -Seconds 60"
+    interpreter = ["Powershell", "-Command"]
+  }
+
+  depends_on = [null_resource.generalize_tempvm_win11]
 }
 
 resource "azurerm_shared_image" "win11_single" {
@@ -311,7 +376,7 @@ resource "azurerm_shared_image" "win11_single" {
   identifier {
     publisher = "AVDLabs"
     offer     = "windows-11"
-    sku       = "win11-22h2-ent"
+    sku       = "win11-23h2-ent"
   }
 }
 
@@ -322,10 +387,10 @@ resource "azurerm_image" "win11_image" {
   resource_group_name       = azurerm_resource_group.rg_primary.name
   hyper_v_generation        = "V2"
   source_virtual_machine_id = azurerm_windows_virtual_machine.win11_template[0].id
-  depends_on                = [null_resource.generalize_win11_tempvm]
+  depends_on                = [null_resource.wait_generalize_win11]
 }
 
-resource "azurerm_shared_image_version" "compute_gallery_version_win11p" {
+resource "azurerm_shared_image_version" "compute_gallery_version_win11" {
   count               = var.deploy_personal
   name                = "0.0.1"
   gallery_name        = azurerm_shared_image_gallery.compute_gallery.name
@@ -338,5 +403,13 @@ resource "azurerm_shared_image_version" "compute_gallery_version_win11p" {
     name                   = var.primary_location
     regional_replica_count = 1
     storage_account_type   = "Standard_LRS"
+  }
+}
+
+#Clean up temporary resources
+resource "null_resource" "cleanup_temp_rg" {
+  depends_on = [azurerm_shared_image_version.compute_gallery_version_win10, azurerm_shared_image_version.compute_gallery_version_win11]
+  provisioner "local-exec" {
+    command = "az group delete --resource-group ${azurerm_resource_group.rg_temp.name} --yes --no-wait"
   }
 }

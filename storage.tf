@@ -66,6 +66,15 @@ resource "azurerm_storage_blob" "script_files_addstoragetodomain" {
   depends_on             = [azurerm_storage_container.dsc_storage_account_container_scripts]
 }
 
+resource "azurerm_storage_blob" "script_files_customizevm" {
+  name                   = "CustomizeVM.ps1"
+  storage_account_name   = azurerm_storage_account.dsc_storage_account.name
+  storage_container_name = azurerm_storage_container.dsc_storage_account_container_scripts.name
+  type                   = "Block"
+  source                 = "CustomizeVM.ps1"
+  depends_on             = [azurerm_storage_container.dsc_storage_account_container_scripts]
+}
+
 resource "azurerm_storage_account" "storage_account_adds" {
   name                     = "${var.resource_prefix}${random_string.random.id}adds1"
   location                 = var.primary_location

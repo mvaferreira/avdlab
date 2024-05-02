@@ -158,7 +158,7 @@ resource "azurerm_virtual_network_dns_servers" "dnsserver_dc_secondary" {
 
 resource "azurerm_network_interface" "tempvm1_nic" {
   name                = "${var.resource_prefix}-tempvm1-nic1"
-  resource_group_name = azurerm_resource_group.rg_primary.name
+  resource_group_name = azurerm_resource_group.rg_temp.name
   location            = var.primary_location
 
   ip_configuration {
@@ -171,7 +171,7 @@ resource "azurerm_network_interface" "tempvm1_nic" {
 resource "azurerm_network_interface" "tempvm2_nic" {
   count               = var.deploy_personal
   name                = "${var.resource_prefix}-tempvm2-nic1"
-  resource_group_name = azurerm_resource_group.rg_primary.name
+  resource_group_name = azurerm_resource_group.rg_temp.name
   location            = var.primary_location
 
   ip_configuration {
