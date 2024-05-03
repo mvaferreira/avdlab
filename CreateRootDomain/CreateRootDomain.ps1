@@ -153,7 +153,7 @@ Configuration CreateRootDomain
             Ensure            = 'Present'
             DomainName        = $DomainName
             GivenName         = 'AVD'
-            SurName           = 'User'
+            SurName           = 'Admin'
             UserName          = 'avdadmin'
             UserPrincipalName = 'avdadmin@{0}' -f $AADDomainName
             Path              = ("OU=Users,OU=Lab,DC={0},DC={1}" -f ($DomainName -split '\.')[0], ($DomainName -split '\.')[1])
